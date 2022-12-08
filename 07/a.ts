@@ -1,4 +1,3 @@
-export const x = "";
 import { readFileSync } from "fs";
 class File {
     name: string;

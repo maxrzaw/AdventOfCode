@@ -8,6 +8,6 @@ const sections = input.split('\n\n');
 const header = sections[0].trimEnd();
 const footer = sections[0].trimEnd();
 
-const lines = footer.split('\n').trimEnd();
+const lines = footer.split('\n');
 
 
