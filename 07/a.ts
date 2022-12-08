@@ -1,6 +1,6 @@
+export const x = "";
 import { readFileSync } from "fs";
-const sizeLimit: number = 100000;
-export class File {
+class File {
     name: string;
     _size: number;
 
@@ -18,7 +18,7 @@ export class File {
     }
 }
 
-export class Dir extends File {
+class Dir extends File {
     content: File[];
     parent: Dir | undefined;
     dirty: boolean = true;
@@ -100,7 +100,7 @@ const lines = input.trimEnd().split('\n');
 
 const root = new Dir("/", undefined);
 let currentDir = root;
-const victims: Dir[] = [];
+
 for (const line of lines) {
     const parsedLine = line.split(' ');
     if (parsedLine[0] === '$') {
@@ -115,7 +115,9 @@ for (const line of lines) {
         currentDir.addFile(line);
     }
 }
-root.print('');
+
+const victims: Dir[] = [];
+const sizeLimit: number = 100000;
 root.walk(victims, sizeLimit);
 console.log(victims.reduce((sum, val) => sum + val.size(), 0));
 
