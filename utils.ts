@@ -65,6 +65,14 @@ export default class Utils {
                 .split(delimeter)
                 .map((num) => parseInt(num)));
     }
+
+    /**
+     * Returns the Manhattan distance between two points.
+     * Uses the formula |x1 - x2| + |y1 - y2|
+     */
+    static ManhattanDistance(a: number[], b: number[]): number {
+        return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+    }
 }
 
 export type GraphEdge = { to: number; weight: number };
