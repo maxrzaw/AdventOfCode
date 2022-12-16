@@ -1,3 +1,4 @@
+export type point = { x: number, y: number };
 export default class Utils {
     static Normalize(x: number): number {
         return x / Math.abs(x);
@@ -70,8 +71,8 @@ export default class Utils {
      * Returns the Manhattan distance between two points.
      * Uses the formula |x1 - x2| + |y1 - y2|
      */
-    static ManhattanDistance(a: number[], b: number[]): number {
-        return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+    static ManhattanDistance(a: point, b: point): number {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 }
 
