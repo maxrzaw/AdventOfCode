@@ -1,4 +1,4 @@
-import { log, profileEnd } from 'console';
+import { log } from 'console';
 import * as fs from 'fs';
 export const x = "";
 

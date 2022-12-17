@@ -18,7 +18,7 @@ lines.forEach((line) => {
     valveStatusStrings.set(valve, false);
 
     const valves: tunnel[] = line.split('valve')[1].replace('s ', '').trim().split(',').map((v) => {
-        return {destination: v.trim(), distance: 1 };
+        return { destination: v.trim(), distance: 1 };
     });
     const m: Map<string, number> = new Map<string, number>();
     for (let tunnel of valves) {
