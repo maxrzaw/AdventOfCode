@@ -99,3 +99,24 @@ export class GraphNode {
         return `(idx: ${this.index}\t value: ${this.value}\t edgeCount: ${this.edges.length}`;
     }
 }
+export class Bits {
+    static GetBitMask(n: number): number {
+        return 1 << n;
+    }
+
+    static SetNthBit(num: number, pos: number): number {
+        const mask = this.GetBitMask(pos);
+        num |= mask;
+        return num;
+    }
+
+    static ClearNthBit(num: number, pos: number): number {
+        const mask = this.GetBitMask(pos);
+        num &= ~mask;
+        return num;
+    }
+
+    static Union(a: number, b: number) {
+        return a & b;
+    }
+}
