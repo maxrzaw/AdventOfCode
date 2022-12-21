@@ -1,0 +1,15 @@
+dbpl: 5
+zczc: 2
+dvpt: 3
+lfqf: 4
+humn: 5
+ljgn: 2
+sllz: 4
+hmdt: 32
+ptdq: humn - dvpt
+lgvd: ljgn * ptdq
+drzm: hmdt - zczc
+cczh: sllz + lgvd
+sjmn: drzm * dbpl
+pppw: cczh / lfqf
+root: pppw + sjmn
