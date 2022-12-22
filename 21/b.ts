@@ -8,7 +8,7 @@ enum Operation {
     Multiply,
     Divide,
     Equality,
-    Human,
+    None,
 };
 
 class Monkey {
@@ -16,7 +16,6 @@ class Monkey {
     left: string;
     right: string;
     operation: Operation;
-    evaluated: boolean = false;
     value: number = 0;
     constructor(input: string) {
         let equation: string;
@@ -39,22 +38,17 @@ class Monkey {
                     this.operation = Operation.Divide;
                     break;
             }
-            this.evaluated = false;
             if (this.name === "root") {
                 this.operation = Operation.Equality;
             }
         } else {
             this.value = parseInt(equation);
-            this.evaluated = true;
-            if (this.name === "humn") {
-                this.value = null;
-                this.evaluated = false;
-            }
+            this.operation = Operation.None;
         }
     }
 
     public Evaluate(monkeys: Map<string, Monkey>): number {
-        if (this.evaluated) {
+        if (this.operation === Operation.None) {
             return this.value;
         }
 
@@ -75,12 +69,18 @@ class Monkey {
             case Operation.Divide:
                 this.value = left / right;
                 break;
+            case Operation.Equality:
+                if (left > right) {
+                    this.value = -1;
+                } else if (left < right) {
+                    this.value = 1;
+                } else {
+                    this.value = 0;
+                }
         }
-        this.evaluated = true;
         return this.value;
     }
 }
-
 
 
 const filename = process.argv[2];
@@ -95,5 +95,35 @@ for (let line of lines) {
 
 
 const root: Monkey = monkeysMap.get("root");
-log(root);
-log(root.Evaluate(monkeysMap));
+const human: Monkey = monkeysMap.get("humn");
+
+let previousValue: number = 1;
+let lower = 0;
+let upper = 0;
+let stillClimbing = true;
+let result = -1;
+while (true) {
+    let currentValue: number;
+    if (result < 0 && stillClimbing) {
+        currentValue = previousValue * 2;
+    } else if (result === 0) {
+        break;
+    } else if (result > 0 && stillClimbing) {
+        stillClimbing = false;
+        upper = previousValue;
+        currentValue = Math.floor(previousValue / 2);
+        lower = currentValue;
+    } else if (result < 0) {
+        lower = previousValue;
+        currentValue = lower + Math.floor(Math.abs(upper - lower) / 2);
+    }
+    else if (result > 0) {
+        upper = previousValue;
+        currentValue = upper - Math.floor(Math.abs(upper - lower) / 2);
+    }
+    human.value = currentValue;
+    result = root.Evaluate(monkeysMap);
+    previousValue = currentValue;
+}
+log(previousValue);
+

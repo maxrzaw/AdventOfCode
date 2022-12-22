@@ -7,6 +7,7 @@ enum Operation {
     Subtract,
     Multiply,
     Divide,
+    None,
 };
 
 class Monkey {
@@ -14,7 +15,6 @@ class Monkey {
     left: string;
     right: string;
     operation: Operation;
-    evaluated: boolean = false;
     value: number = 0;
     constructor(input: string) {
         let equation: string;
@@ -37,15 +37,14 @@ class Monkey {
                     this.operation = Operation.Divide;
                     break;
             }
-            this.evaluated = false;
         } else {
             this.value = parseInt(equation);
-            this.evaluated = true;
+            this.operation = Operation.None;
         }
     }
 
     public Evaluate(monkeys: Map<string, Monkey>): number {
-        if (this.evaluated) {
+        if (this.operation === Operation.None) {
             return this.value;
         }
 
@@ -67,7 +66,7 @@ class Monkey {
                 this.value = left / right;
                 break;
         }
-        this.evaluated = true;
+        this.operation = Operation.None; // this does not actually matter
         return this.value;
     }
 }
@@ -82,7 +81,5 @@ for (let line of lines) {
     monkeysMap.set(monkeyName, new Monkey(line));
 }
 
-
 const root: Monkey = monkeysMap.get("root");
-log(root);
 log(root.Evaluate(monkeysMap));
