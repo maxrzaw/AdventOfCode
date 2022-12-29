@@ -3,23 +3,18 @@ export const x = "";
 
 const filename = process.argv[2];
 
-const input = fs.readFileSync(filename, 'utf8');
-let lines = input.split('\n');
-lines.pop();
+let lines = fs.readFileSync(filename, 'utf8').split('\n').slice(0, -1);
 
 let groups: string[][] = [];
 while (lines.length) {
-    let group = lines.slice(0, 3);
-    groups.push(group);
+    groups.push(lines.slice(0, 3));
     lines = lines.slice(3);
 }
 
 const priorities: number[] = [];
 
 for (let group of groups) {
-    let left = group[0];
-    let center = group[1];
-    let right = group[2];
+    let [left, center, right] = group;
     for (let letter of left) {
         if (right.includes(letter) && center.includes(letter)) {
             if (letter.toUpperCase() === letter) {
@@ -32,4 +27,4 @@ for (let group of groups) {
     }
 }
 
-console.log(priorities.reduce( (sum, value) => sum + value, 0));
+console.log(priorities.reduce((sum, value) => sum + value, 0));

@@ -3,15 +3,12 @@ export const x = "";
 
 const filename = process.argv[2];
 
-const input = fs.readFileSync(filename, 'utf8');
-const lines = input.split('\n');
-lines.pop();
+let lines = fs.readFileSync(filename, 'utf8').split('\n').slice(0, -1);
 
 const priorities: number[] = [];
 for (let sack of lines) {
-    let length = sack.length;
-    let left = sack.substring(0, (length / 2));
-    let right = sack.substring((length / 2));
+    let left = sack.substring(0, (sack.length / 2));
+    let right = sack.substring((sack.length / 2));
     for (let letter of left) {
         if (right.includes(letter)) {
             if (letter.toUpperCase() === letter) {
