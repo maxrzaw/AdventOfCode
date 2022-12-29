@@ -1,24 +1,21 @@
 import * as fs from 'fs';
 export const x = "";
 
-const filename = process.argv[2];
+const lines = fs.readFileSync(process.argv[2], 'utf8').split('\n').slice(0, -1);
 
-const input = fs.readFileSync(filename, 'utf8');
-
-let count = 0;
-const lines = input.split('\n');
-console.log(lines);
-lines.pop();
-console.log(lines);
-
+let countOne = 0;
+let countTwo = 0;
 for (let line of lines) {
     let left = line.split(',')[0].split('-');
     let right = line.split(',')[1].split('-');
+    if ((parseInt(left[1]) >= parseInt(right[0]) && parseInt(right[1]) >= parseInt(left[0])) ||
+        (parseInt(right[1]) >= parseInt(left[0]) && parseInt(left[1]) >= parseInt(right[0]))) {
+        countTwo += 1;
+    }
     if ((parseInt(left[0]) <= parseInt(right[0]) && parseInt(left[1]) >= parseInt(right[1])) ||
         (parseInt(right[0]) <= parseInt(left[0]) && parseInt(right[1]) >= parseInt(left[1]))) {
-        count += 1;
-        console.log(line);
+        countOne += 1;
     }
 }
 
-console.log(count);
+console.log(`Part One: ${countOne}\nPart Two: ${countTwo}`);
