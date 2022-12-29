@@ -1,12 +1,7 @@
-import { log } from 'console';
 import * as fs from 'fs';
 export const x = "";
 
-const filename = process.argv[2];
-
-const input = fs.readFileSync(filename, 'utf8');
-
-let trees: number[][] = input.trimEnd().split('\n').map((line) => line.trimEnd().split('').map((num) => parseInt(num)));
+let trees: number[][] = fs.readFileSync(process.argv[2], 'utf8').trimEnd().split('\n').map((line) => line.trimEnd().split('').map((num) => parseInt(num)));
 const seen: number[][] = Array.from({ length: trees.length }, () => Array.from({ length: trees.length }, () => 0));
 
 // left to right
@@ -46,8 +41,8 @@ for (let j = 0; j < trees.length; ++j) {
         }
     }
 }
-// bottom to top
 
+// bottom to top
 for (let j = 0; j < trees.length; ++j) {
     let tallest: number = 0;
     for (let i = 0; i < trees[j].length; ++i) {
@@ -58,6 +53,4 @@ for (let j = 0; j < trees.length; ++j) {
     }
 }
 
-
-log(trees, seen);
-log(seen.reduce((sum, val) => sum + val.reduce((s, v) => s + v, 0), 0));
+console.log(seen.reduce((sum, val) => sum + val.reduce((s, v) => s + v, 0), 0));
