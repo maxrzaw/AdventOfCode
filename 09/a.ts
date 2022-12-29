@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 export const x = "";
+
 function getX(dir: string): number {
     if (dir === 'L' || dir === 'R') {
         return 0;
@@ -20,38 +21,24 @@ function getY(dir: string): number {
     return -1;
 }
 
-function print(arr: number[][]) {
-    for (let i = 0; i < arr.length; ++i) {
-        let out: string = "";
-        for (let j = 0; j < arr.length; j++) {
-            out += arr[arr.length - i - 1][j] === 0 ? '.' : '#';
-        }
-        console.log(out);
-    }
-}
-
-const filename = process.argv[2];
-const SIZE = 540;
-
-const input = fs.readFileSync(filename, 'utf8');
-const moves = input.trimEnd().split('\n');
-const points: number[][] = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => 0));
-let hx = 200;
-let hy = 200;
-let tx = 200;
-let ty = 200;
-points[hx][hy] = 1;
-
-function isAdjacent(): boolean {
-    if (Math.max(Math.abs(hx - tx), Math.abs(hy - ty)) > 1) {
+function isAdjacent(current: number): boolean {
+    if (Math.max(Math.abs(exes[current - 1] - exes[current]), Math.abs(whys[current - 1] - whys[current])) > 1) {
         return false;
     }
-    if (Math.abs(hx - tx) + Math.abs(hy - ty) > 2) {
+    if (Math.abs(exes[current - 1] - exes[current]) + Math.abs(whys[current - 1] - whys[current]) > 2) {
         return false;
     }
 
     return true;
 }
+
+const KNOT_COUNT: number = parseInt(process.argv[3]);
+
+const moves = fs.readFileSync(process.argv[2], 'utf8').trimEnd().split('\n');
+const points: number[][] = Array.from({ length: 500 }, () => Array.from({ length: 250 }, () => 0));
+
+const exes: number[] = Array.from({ length: KNOT_COUNT }, () => 125);
+const whys: number[] = Array.from({ length: KNOT_COUNT }, () => 250);
 
 for (let move of moves) {
     const [dir, distance] = move.split(' ');
@@ -61,24 +48,24 @@ for (let move of moves) {
     const y_dir = getY(dir);
 
     for (let i = 0; i < dist; ++i) {
-        hx += x_dir;
-        hy += y_dir;
-
-        if (!isAdjacent()) {
-            if (Math.abs(hx - tx) > 0) {
-                tx += Math.sign(hx - tx);
+        exes[0] += x_dir;
+        whys[0] += y_dir;
+        for (let j = 1; j < KNOT_COUNT; ++j) {
+            if (isAdjacent(j)) {
+                continue;
             }
 
-            if (Math.abs(hy - ty) > 0) {
-                ty += Math.sign(hy - ty);
+            if (Math.abs(exes[j - 1] - exes[j]) > 0) {
+                exes[j] += Math.sign(exes[j - 1] - exes[j]);
             }
 
-            points[tx][ty] = 1;
+            if (Math.abs(whys[j - 1] - whys[j]) > 0) {
+                whys[j] += Math.sign(whys[j - 1] - whys[j]);
+            }
+
+            points[exes[KNOT_COUNT - 1]][whys[KNOT_COUNT - 1]] = 1;
         }
     }
-
 }
 
-print(points);
-let count = points.reduce((t, v) => t + v.reduce((s, v) => s + v, 0), 0);
-console.log(count);
+console.log(points.reduce((t, v) => t + v.reduce((s, v) => s + v, 0), 0));
