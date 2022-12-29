@@ -1,29 +1,10 @@
 import * as fs from 'fs';
-export const x = "";
 
-const filename = process.argv[2];
-console.log(filename);
+declare global { interface Array<T> { sum(this: Array<number>): number; } }
+Array.prototype.sum = function() { return this.reduce((total: number, num: number) => total + num, 0); }
 
-const input = fs.readFileSync(filename, 'utf8');
+const sums = fs.readFileSync(process.argv[2], 'utf8').split("\n\n").map((items) => items.split('\n')
+    .map(val => parseInt(val, 10)).filter(n => !isNaN(n)).sum()).sort((a, b) => b - a);
 
-let elves = input.split("\n\n");
+console.log(`part 1: ${sums.slice(0, 3).sum()}\npart 2: ${sums.slice(0, 1).sum()}`);
 
-let highest = 0;
-
-for (const elve of elves)
-{
-    let count = 0;
-    const items = elve.split("\n");
-    for (const item of items)
-    {
-        const calories = parseInt(item, 10);
-        count += calories;
-    }
-
-    if (count > highest)
-    {
-        highest = count;
-    }
-}
-
-console.log(highest);
