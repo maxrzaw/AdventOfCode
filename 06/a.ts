@@ -1,21 +1,12 @@
 import * as fs from 'fs';
 export const x = "";
 
-const filename: string = process.argv[2];
 const count: number = parseInt(process.argv[3]);
-
-const input: string = fs.readFileSync(filename, 'utf8');
-
-let last: string[] = Array.from({ length: count }, () => "");
+const input: string = fs.readFileSync(process.argv[2], 'utf8');
 
 for (let i = 0; i < input.length; ++i) {
-    last.unshift(input[i]);
-    last.pop();
-
-    let set: Set<string> = new Set(last);
-
-    if (i > count && set.size === count) {
-        console.log(i + 1);
+    if (new Set(input.substring(i, count + i)).size === count) {
+        console.log(i + count);
         break;
     }
 }
