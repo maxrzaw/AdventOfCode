@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+
 class File {
     name: string;
     _size: number;
@@ -48,9 +49,7 @@ class Dir extends File {
 
     size(): number {
         if (this.dirty) {
-            this._size = this.content.reduce((sum, file) => {
-                return sum + file.size();
-            }, 0);
+            this._size = this.content.reduce((sum, file) => { return sum + file.size(); }, 0);
         }
         return this._size;
     }
@@ -75,15 +74,18 @@ class Dir extends File {
         }
     }
 
-    walk(victims: Dir[], limit: number): void {
+    walkMinimum(victims: Dir[], minimum: number): void {
+        if (this.size() >= minimum) {
+            victims.push(this);
+        }
+        this.content.forEach((f) => { if (f instanceof Dir) { f.walkMinimum(victims, minimum); } });
+    }
+
+    walkLimit(victims: Dir[], limit: number): void {
         if (this.size() <= limit) {
             victims.push(this);
         }
-        this.content.forEach((f) => {
-            if (f instanceof Dir) {
-                f.walk(victims, limit);
-            }
-        });
+        this.content.forEach((f) => { if (f instanceof Dir) { f.walkLimit(victims, limit); } });
     }
 
     print(prefix: string): void {
@@ -92,10 +94,7 @@ class Dir extends File {
     }
 }
 
-const filename = process.argv[2];
-
-const input = readFileSync(filename, 'utf8');
-const lines = input.trimEnd().split('\n');
+const lines = readFileSync(process.argv[2], 'utf8').trimEnd().split('\n');
 
 const root = new Dir("/", undefined);
 let currentDir = root;
@@ -115,8 +114,12 @@ for (const line of lines) {
     }
 }
 
-const victims: Dir[] = [];
-const sizeLimit: number = 100000;
-root.walk(victims, sizeLimit);
-console.log(victims.reduce((sum, val) => sum + val.size(), 0));
+const victimsOne: Dir[] = [];
+const victimsTwo: Dir[] = [];
+
+root.walkLimit(victimsOne, 100000);
+root.walkMinimum(victimsTwo, root.size() + 30000000 - 70000000);
+
+console.log(`Part One: ${victimsOne.reduce((sum, val) => sum + val.size(), 0)}`);
+console.log(`Part Two: ${victimsTwo.sort((a, b) => b.size() - a.size()).slice(-1)[0].size()}`);
 
