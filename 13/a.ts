@@ -1,28 +1,16 @@
-import { log } from 'console';
 import * as fs from 'fs';
 export const x = "";
 
-function isNumber(obj: any): boolean {
-    return typeof (obj) === 'number';
-}
+function isNumber(obj: any): boolean { return typeof (obj) === 'number'; }
 
-enum Result {
-    Right,
-    Wrong,
-    Inconclusive
-}
+enum Result { Right, Wrong, Inconclusive }
 
 function Compare(left: Array<any> | number, right: Array<any> | number, prefix: string = ""): Result {
-    log(`${prefix}- Compare ${left} vs ${right}`);
-
     // Both numbers
     if (isNumber(left) && isNumber(right)) {
         if (left < right) {
-            log(prefix + "  - Left side is smaller, so imputs are in the right order");
             return Result.Right;
         } else if (left > right) {
-
-            log(prefix + "  - Right side is smaller, so imputs are not in the right order");
             return Result.Wrong;
         }
         return Result.Inconclusive;
@@ -30,21 +18,19 @@ function Compare(left: Array<any> | number, right: Array<any> | number, prefix: 
 
     // Both Arrays
     if (Array.isArray(left) && Array.isArray(right)) {
-        const length = Math.min(left.length, right.length);
-        for (let i = 0; i < length; ++i) {
-            let result = Compare(left[i], right[i], prefix + "  ");
+        for (let i = 0; i < Math.min(left.length, right.length); ++i) {
+            const result = Compare(left[i], right[i], prefix + "  ");
             if (result != Result.Inconclusive) {
                 return result;
             }
         }
 
         if (right.length < left.length) {
-            log(prefix + "  - Right side ran out of items, so inputs are not in the right order");
             return Result.Wrong;
         } else if (left.length < right.length) {
-            log(prefix + "  - Left side ran out of items, so inputs are in the right order");
             return Result.Right;
         }
+
         return Result.Inconclusive;
     }
 
@@ -59,22 +45,34 @@ function Compare(left: Array<any> | number, right: Array<any> | number, prefix: 
     return Compare(left, right, prefix + "  ");
 }
 
-const filename = process.argv[2];
-const input = fs.readFileSync(filename, 'utf8');
-const pairs = input.trimEnd().split('\n\n');
+const pairs = fs.readFileSync(process.argv[2], 'utf8').trimEnd().split('\n\n');
 
 let sum = 0;
+let two = 1;
+let six = 2;
 for (let i = 0; i < pairs.length; ++i) {
-    const [left, right] = pairs[i].split('\n');
-    const leftArray: Array<any> = JSON.parse(left.trim()) as Array<any>;
-    const rightArray: Array<any> = JSON.parse(right.trim()) as Array<any>;
+    const [left, right] = pairs[i].split('\n').map((s) => JSON.parse(s.trim()) as Array<any>);
 
-    log(`\n== Pair ${i + 1} ==`);
-    log(pairs[i]);
-    let result = Compare(leftArray, rightArray);
+    // Part One
+    let result = Compare(left, right);
     if (result === Result.Right) {
         sum += i + 1;
     }
+
+    // Part Two
+    if (Compare([[2]], left) === Result.Wrong) {
+        two++;
+    }
+    if (Compare([[2]], right) === Result.Wrong) {
+        two++;
+    }
+    if (Compare([[6]], left) === Result.Wrong) {
+        six++;
+    }
+    if (Compare([[6]], right) === Result.Wrong) {
+        six++;
+    }
 }
 
-log(sum);
+console.log(`Part One: ${sum}`);
+console.log(`Part Two: ${two * six}`);
