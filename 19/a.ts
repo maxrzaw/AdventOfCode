@@ -1,13 +1,7 @@
-import { log } from 'console';
 import * as fs from 'fs';
 export const ex = "";
 
-enum Mineral {
-    Ore = "Ore",
-    Clay = "Clay",
-    Obsidian = "Obsidian",
-    Geode = "Geode",
-}
+enum Mineral { Ore = "Ore", Clay = "Clay", Obsidian = "Obsidian", Geode = "Geode", }
 
 const stringToMineral: Map<string, Mineral> = new Map<string, Mineral>([
     ["ore", Mineral.Ore],
@@ -19,9 +13,7 @@ const stringToMineral: Map<string, Mineral> = new Map<string, Mineral>([
 type minerals = { ore: number, clay: number, obsidian: number, geode: number };
 
 function CanBuild(resources: minerals, cost: minerals): boolean {
-    return (resources.ore >= cost.ore &&
-        resources.clay >= cost.clay &&
-        resources.obsidian >= cost.obsidian);
+    return (resources.ore >= cost.ore && resources.clay >= cost.clay && resources.obsidian >= cost.obsidian);
 }
 
 function WorthBuilding(robots: minerals, max: minerals, product: Mineral): boolean {
@@ -123,9 +115,7 @@ class Blueprint {
         }
     }
 
-    public GetQualityLevel(): number {
-        return this.geodeCount * this.id;
-    }
+    public GetQualityLevel(): number { return this.geodeCount * this.id; }
 
     public CalculateGeodeScore(minutes: number): void {
         const robots: minerals = { ore: 1, clay: 0, obsidian: 0, geode: 0 };
@@ -134,9 +124,6 @@ class Blueprint {
     }
 
     private GetMinerals(robots: minerals, resources: minerals, minutes: number): number {
-        // if (resources.geode === 9) {
-        //     log(robots, resources, minutes);
-        // }
         if (minutes === 0) {
             return resources.geode;
         }
@@ -154,7 +141,7 @@ class Blueprint {
 
         geodeBuilt = false;
 
-        if (!geodeBuilt //&& minutes >= this.oreBot.cost.ore
+        if (!geodeBuilt
             && CanBuild(resources, this.oreBot.cost)
             && WorthBuilding(resources, this.maxCost, this.oreBot.product)
         ) {
@@ -190,10 +177,6 @@ class Blueprint {
             max = Math.max(max, this.GetMinerals(robots, nextResources, minutes - 1));
         }
 
-        // create
-        //log(robots, resources);
-        // log(`${prefix}returning ${max}`);
-        // log();
         return max;
     }
 }
@@ -212,19 +195,18 @@ function ParseCost(cost: string): minerals {
     let out: minerals = { ore: 0, clay: 0, obsidian: 0, geode: 0 };
     for (let item of items) {
         const [val, mineral] = item.trim().split(' ');
-        const value = parseInt(val);
         switch (mineral) {
             case "ore":
-                out.ore = value;
+                out.ore = parseInt(val);
                 break;
             case "clay":
-                out.clay = value;
+                out.clay = parseInt(val);
                 break;
             case "obsidian":
-                out.obsidian = value;
+                out.obsidian = parseInt(val);
                 break;
             case "geode":
-                out.geode = value;
+                out.geode = parseInt(val);
                 break;
             default:
                 break;
@@ -248,16 +230,20 @@ function ParseBlueprint(blueprint: string): Blueprint {
 
 }
 
-const filename = process.argv[2];
+const blueprints: Blueprint[] = fs.readFileSync(process.argv[2], 'utf8').trim().split('\n').map((line) => ParseBlueprint(line));
 
-const input = fs.readFileSync(filename, 'utf8');
-
-const blueprints: Blueprint[] = input.trim().split('\n').map((line) => ParseBlueprint(line));
-
-let sum = 0;
+let sumPartOne = 0;
 for (let blueprint of blueprints) {
     blueprint.CalculateGeodeScore(24);
-    log(`blueprint: ${blueprint.id}, result: ${blueprint.geodeCount}`);
-    sum += blueprint.GetQualityLevel();
+    sumPartOne += blueprint.GetQualityLevel();
 }
-log(sum);
+console.log(`Part One: ${sumPartOne}`);
+
+let sumPartTwo = 0;
+for (let i = 0; i < 3; ++i) {
+    const blueprint: Blueprint = blueprints[i];
+    blueprint.CalculateGeodeScore(32);
+    console.log(`blueprint: ${blueprint.id}, result: ${blueprint.geodeCount}`);
+    sumPartTwo *= blueprint.GetQualityLevel();
+}
+console.log(`Part Two: ${sumPartTwo}`);
