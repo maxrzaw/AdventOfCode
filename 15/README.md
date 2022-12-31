@@ -118,3 +118,9 @@ To isolate the distress beacon's signal, you need to determine its _tuning frequ
 In the example above, the search space is smaller: instead, the `x` and `y` coordinates can each be at most `20`. With this reduced search area, there is only a single position that could have a beacon: `x=14, y=11`. The tuning frequency for this distress beacon is _`56000011`_.
 
 Find the only possible position for the distress beacon. _What is its tuning frequency?_
+
+
+```bash
+# use this command for part one and two
+ts-node q.ts input.txt 2000000 4000000
+```

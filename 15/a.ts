@@ -1,48 +1,30 @@
-import { log } from 'console';
 import * as fs from 'fs';
 import Utils, { point } from '../utils';
 
 export const ex = "";
 type lineSegment = { start: number, end: number };
-class sensor {
-    location: point;
-    beacon: point;
-};
+class sensor { location: point; beacon: point; };
 
-// I found out this was a terrible way to do this in part two...
-function GetRuledOut(sensor: sensor, y: number): lineSegment | null {
+function GetRuledOut(sensor: sensor, y: number, min: number, max: number): lineSegment | null {
     const distance = Utils.ManhattanDistance(sensor.location, sensor.beacon);
     let middle = sensor.location.x;
-    let left = middle;
-    let right = middle;
-    let currentDistance = Utils.ManhattanDistance(sensor.location, {x: middle, y: y });
-    if (currentDistance > distance) {
+    if (Utils.ManhattanDistance(sensor.location, { x: middle, y: y }) > distance) {
         return null;
     }
-    // find left
-    while (Utils.ManhattanDistance(sensor.location, {x: left, y: y }) < distance) {
-        left--
-    }
 
-    // find right
-    while (Utils.ManhattanDistance(sensor.location, {x: right, y: y }) < distance) {
-        right++;
-    }
+    let left = middle - distance + Math.abs(sensor.location.y - y);
+    let right = middle + distance - Math.abs(sensor.location.y - y);
+    left = Math.max(min, left);
+    right = Math.min(max, right);
 
     return { start: left, end: right };
 }
 
-const filename = process.argv[2];
 const y = parseInt(process.argv[3]);
+const maxCoordinate = parseInt(process.argv[4]);
 
-const input = fs.readFileSync(filename, 'utf8');
-const lines = input.trim().split('\n');
-
-const sensors: sensor[] = lines.map((line) => {
-    const points: point[] = line
-    .replace("Sensor at ", "")
-    .split(": closest beacon is at ")
-    .map((coord) => {
+const sensors: sensor[] = fs.readFileSync(process.argv[2], 'utf8').trim().split('\n').map((line) => {
+    const points: point[] = line.replace("Sensor at ", "").split(": closest beacon is at ").map((coord) => {
         const [x, y] = coord.replace("x=", "").split(", y=").map((val) => parseInt(val));
         return { x: x, y: y };
     });
@@ -52,7 +34,7 @@ const sensors: sensor[] = lines.map((line) => {
 // Done with parsing, now the fun begins
 let spots = new Set<number>();
 for (let sense of sensors) {
-    const segment: lineSegment | null = GetRuledOut(sense, y);
+    const segment: lineSegment | null = GetRuledOut(sense, y, -Infinity, Infinity);
     if (segment === null) {
         continue;
     }
@@ -75,4 +57,36 @@ for (let sensor of sensors) {
     }
 }
 
-log(spots.size);
+console.log(`Part One: ${spots.size}`);
+
+let x = -Infinity;
+for (let y = 0; y < maxCoordinate; ++y) {
+    let segments: lineSegment[] = [];
+    for (let sense of sensors) {
+        let segment: lineSegment | null = GetRuledOut(sense, y, 0, maxCoordinate);
+        if (segment === null) {
+            continue;
+        }
+
+        // I don't care about the other portions of the space
+        segment.start = Math.max(segment.start, 0);
+        segment.end = Math.min(segment.end, maxCoordinate);
+        segments.push(segment);
+    }
+
+    segments.sort((a, b) => a.start - b.start);
+    let grandSegment = { start: 0, end: 0 };
+
+    for (let segment of segments) {
+        if (segment.start > grandSegment.end) {
+            x = segment.start - 1;
+            break;
+        }
+        grandSegment.end = Math.max(grandSegment.end, segment.end);
+    }
+
+    if (x !== -Infinity) {
+        console.log(`Part Two: ${maxCoordinate} * (x:${x}) + (y:${y}) = ${maxCoordinate * x + y}`);
+        break;
+    }
+}
