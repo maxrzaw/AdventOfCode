@@ -1,5 +1,5 @@
-import { log } from 'console';
 import * as fs from 'fs';
+import { Bits } from '../utils';
 export const x = "";
 
 type tunnel = { destination: string, distance: number };
@@ -9,9 +9,7 @@ const tunnelsStrings: Map<string, Map<string, number>> = new Map<string, Map<str
 const filename = process.argv[2];
 const allValves: string[] = [];
 
-const input = fs.readFileSync(filename, 'utf8');
-const lines = input.trim().split('\n');
-lines.forEach((line) => {
+fs.readFileSync(filename, 'utf8').trim().split('\n').forEach((line) => {
     const valve: string = line.slice(6, 8);
     const rate: number = parseInt(line.split(';')[0].split('=')[1]);
     flowRatesStrings.set(valve, rate);
@@ -41,9 +39,7 @@ for (let currentValve of tunnelsStrings.keys()) {
         const nextValveTunnels = tunnelsStrings.get(nextValve);
         for (let twoHopValve of nextValveTunnels.keys()) {
             let newDistanceFromCurrentValve = distanceFromCurrentValve + nextValveTunnels.get(twoHopValve);
-            // add one for the 
-            // if the valve can already see it, update it to the shortest
-            // distance
+            // if the valve can already see it, update it to the shortest distance
             if (possibleValves.has(twoHopValve)) {
                 if (possibleValves.get(twoHopValve) > newDistanceFromCurrentValve) {
                     possibleValves.set(twoHopValve, newDistanceFromCurrentValve);
@@ -95,20 +91,34 @@ for (let key of tunnelsStrings.keys()) {
     tunnels.set(valveToInt.get(key), a);
 }
 
-log(flowRatesStrings, valveStatusStrings, tunnelsStrings);
-log(allValves, flowRates, valveStatus, tunnels);
+const totals = new Map<number, number>();
+let grandTotal = 0;
 
-function GetMaxPressure(valve: number, time: number): number {
+function GetMaxPressure(valve: number, time: number, path: number, total: number): number {
     // Base Case: Ran out of time, I guess we could get negative
+    if (valve !== 0) {
+        path = Bits.SetNthBit(path, valve);
+    }
     if (time <= 0) {
         return -Infinity;
     }
+
     let pressureReleased = 0;
     const flowRate = flowRates.get(valve);
     if (flowRate !== 0) {
         // take one minute to open the valve
         time--;
         pressureReleased = time * flowRate;
+        total += pressureReleased;
+        if (totals.has(path) && totals.get(path) < total) {
+            totals.set(path, total);
+        } else if (!totals.has(path)) {
+            totals.set(path, total);
+        }
+
+        if (total > grandTotal) {
+            grandTotal = total;
+        }
         // mark the current valve as opened
         valveStatus.set(valve, true);
     }
@@ -122,7 +132,7 @@ function GetMaxPressure(valve: number, time: number): number {
         if (valveStatus.get(key) === false) { // valve has not been opened yet
             const distance = currentValves.get(key);
             // set the additional pressure that will be released
-            pressuresReleased.set(key, GetMaxPressure(key, time - distance));
+            pressuresReleased.set(key, GetMaxPressure(key, time - distance, path, total));
         }
     }
 
@@ -142,4 +152,23 @@ function GetMaxPressure(valve: number, time: number): number {
 // mark the starting valve as Open (actually it is stuck closed)
 valveStatus.set(valveToInt.get("AA"), true);
 
-log(GetMaxPressure(valveToInt.get("AA"), 30));
+const result = GetMaxPressure(valveToInt.get("AA"), parseInt(process.argv[3]), 0, 0);
+const totalArray = Array.from(totals.entries()).sort((a, b) => b[1] - a[1]);
+let total = 0;
+for (let i = 0; i < totalArray.length; ++i) {
+    const a = totalArray[i];
+    for (let j = 0; j < totalArray.length; j++) {
+        if (i === j) {
+            continue;
+        }
+
+        const b = totalArray[j];
+        let unique = Bits.Union(a[0], b[0]) === 0;
+        if (unique && a[1] + b[1] > total) {
+            total = a[1] + b[1];
+        }
+    }
+}
+
+console.log(`Max pressure released by just me after ${process.argv[3]} minutes: ${result}`);
+console.log(`Max pressure released by the Elephant and I after ${parseInt(process.argv[3]) + 4} minutes: ${total}`);

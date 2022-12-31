@@ -233,3 +233,8 @@ In the example above, you could teach the elephant to help you as follows:
 With the elephant helping, after 26 minutes, the best you could do would release a total of _`1707`_ pressure.
 
 _With you and an elephant working together for 26 minutes, what is the most pressure you could release?_
+
+``` bash
+# simulate 26 minutes alone or 30 min with elephant
+ts-node a.ts input.txt 26
+```
