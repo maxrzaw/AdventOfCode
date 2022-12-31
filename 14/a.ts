@@ -1,21 +1,9 @@
-import { log } from 'console';
 import * as fs from 'fs';
 export const x = "";
 
 const filename = process.argv[2];
 const GetX = (x: number): number => {
     return x - 325;
-}
-
-function PrintCave(cave: string[][]) {
-    let i = 0;
-    for (let row of cave) {
-        let out = "" + i++ + '\t';
-        for (let col of row) {
-            out += col;
-        }
-        log(out);
-    }
 }
 
 const DrawLine = (cave: string[][], start: number[], end: number[]): void => {
@@ -31,8 +19,7 @@ const DrawLine = (cave: string[][], start: number[], end: number[]): void => {
 
 const source: number[] = [0, GetX(500)];
 
-const input = fs.readFileSync(filename, 'utf8');
-const lines = input.trimEnd().split('\n').map((line) => line.trim().split(" -> ").map((point) => point.split(',').map((val) => parseInt(val))));
+const lines = fs.readFileSync(filename, 'utf8').trimEnd().split('\n').map((line) => line.trim().split(" -> ").map((point) => point.split(',').map((val) => parseInt(val))));
 
 const cave: string[][] = Array.from({ length: 174 }, () => Array.from({ length: 350 }, () => "."));
 
@@ -47,6 +34,7 @@ for (let line of lines) {
         DrawLine(cave, line[i], line[i + 1]);
     }
 }
+
 cave[source[0]][source[1]] = '+';
 
 let totalSand = 0;
@@ -56,8 +44,7 @@ while (true) {
         break;
     }
 
-    const dx = [0, -1, 1];
-    const dy = [1, 1, 1];
+    const [dx, dy] = [[0, -1, 1], [1, 1, 1]];
     let stopped: boolean = true;
 
     for (let i = 0; i < 3; ++i) {
@@ -78,5 +65,4 @@ while (true) {
     }
 }
 
-PrintCave(cave);
-log(totalSand);
+console.log(totalSand);
