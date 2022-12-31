@@ -1,55 +1,22 @@
 import { log } from 'console';
 import { Bits } from '../utils';
 
-export enum ShapeType {
-    HorizontalLine,
-    Cross,
-    RightAngle,
-    VerticalLine,
-    Square,
-};
+export enum ShapeType { HorizontalLine, Cross, RightAngle, VerticalLine, Square, };
 
-function CreateHorizontalLine(): number[] {
-    return [Bits.SetBits(0, [3, 4, 5, 6])];
-}
+function CreateHorizontalLine(): number[] { return [Bits.SetBits(0, [3, 4, 5, 6])]; }
 
-function CreateCross(): number[] {
-    let arr: number[] = [];
-    arr.push(Bits.SetBits(0, [4]));
-    arr.push(Bits.SetBits(0, [3, 4, 5]));
-    arr.push(Bits.SetBits(0, [4]));
-    return arr;
-}
+function CreateCross(): number[] { return [Bits.SetBits(0, [4]), Bits.SetBits(0, [3, 4, 5]), Bits.SetBits(0, [4])]; }
 
-function CreateRightAngle(): number[] {
-    let arr: number[] = [];
-    arr.push(Bits.SetBits(0, [3, 4, 5]));
-    arr.push(Bits.SetBits(0, [5]));
-    arr.push(Bits.SetBits(0, [5]));
-    return arr;
-}
+function CreateRightAngle(): number[] { return [Bits.SetBits(0, [3, 4, 5]), Bits.SetBits(0, [5]), Bits.SetBits(0, [5])]; }
+
+function CreateSquare(): number[] { return [Bits.SetBits(0, [3, 4]), Bits.SetBits(0, [3, 4])] }
 
 function CreateVerticalLine(): number[] {
-    let arr: number[] = [];
-    arr.push(Bits.SetBits(0, [3]));
-    arr.push(Bits.SetBits(0, [3]));
-    arr.push(Bits.SetBits(0, [3]));
-    arr.push(Bits.SetBits(0, [3]));
-    return arr;
-}
-
-function CreateSquare(): number[] {
-    let arr: number[] = [];
-    arr.push(Bits.SetBits(0, [3, 4]));
-    arr.push(Bits.SetBits(0, [3, 4]));
-    return arr;
+    return [Bits.SetBits(0, [3]), Bits.SetBits(0, [3]), Bits.SetBits(0, [3]), Bits.SetBits(0, [3]),];
 }
 
 export class Shape {
     private bottomRow: number = null;
-
-    // who knows if I will need this?
-    private shapeType: ShapeType = null;
 
     // the shape will technically be upside down
     // Representing it as an array of numbers, settign the bits where there is
@@ -150,30 +117,9 @@ export class Shape {
         }
     }
 
-    public GetShape(): number[] {
-        return this.shape;
-    }
+    public GetShape(): number[] { return this.shape; }
 
-    public GetShapeType(): ShapeType {
-        return this.shapeType;
-    }
+    public GetBottomLevel(): number { return this.bottomRow; }
 
-    public GetBottomLevel(): number {
-        return this.bottomRow;
-    }
-
-    public GetTopLevel(): number {
-        return this.bottomRow + this.shape.length - 1;
-    }
-
-    public Print(includeWalls: boolean = false): void {
-        for (let line of this.shape.slice().reverse()) {
-            if (includeWalls) {
-                line = Bits.SetBits(line, [0, 8]);
-            }
-            log(line.toString(2).split("").reverse().join("").slice(0, 9).padEnd(9, "0").replaceAll("0", ".").replaceAll("1", "#"));
-        }
-    }
+    public GetTopLevel(): number { return this.bottomRow + this.shape.length - 1; }
 };
-
-

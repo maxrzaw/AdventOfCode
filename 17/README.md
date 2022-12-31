@@ -353,3 +353,8 @@ The elephants are not impressed by your simulation. They demand to know how tall
 In the example above, the tower would be _`1514285714288`_ units tall!
 
 _How tall will the tower be after `1000000000000` rocks have stopped?_
+
+```bash
+# use this command to simulate N rounds
+ts-node a.ts input.txt 1000000000000
+```

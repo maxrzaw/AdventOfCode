@@ -1,10 +1,9 @@
-import { log } from 'console';
 import * as fs from 'fs';
 import { Bits } from '../utils';
 import { Shape, ShapeType } from './Shapes';
 export const ex = "";
 
-const ROCKS: number = 2022;
+const ROCKS: number = parseInt(process.argv[3]);
 
 const shapeOrder: ShapeType[] = [
     ShapeType.HorizontalLine,
@@ -14,15 +13,9 @@ const shapeOrder: ShapeType[] = [
     ShapeType.Square,
 ];
 
-let i = 0;
+let rockIndex = 0;
 function GetNextShape(): ShapeType {
-    return shapeOrder[i++ % shapeOrder.length];
-}
-
-function PrintChamber(chamber: number[]): void {
-    for (let line of chamber.slice(-10).reverse()) {
-        log(line.toString(2).split("").reverse().join("").slice(0, 9).padEnd(9, "0").replaceAll("0", ".").replaceAll("1", "#"));
-    }
+    return shapeOrder[rockIndex++ % shapeOrder.length];
 }
 
 const wallsMask: number = Bits.SetBits(0, [0, 8]);
@@ -50,25 +43,72 @@ const filename = process.argv[2];
 const input = fs.readFileSync(filename, 'utf8')
 const jets = input.trim().split('');
 
-
+let rocks: number[] = [];
 let maxHeight: number = 0;
 let rock: Shape = new Shape(maxHeight + 4, GetNextShape());
-while (true) {
-    for (let jet of jets) {
-        // Jet pushes the rock
-        if (i === ROCKS + 1) {
-            break;
+type value = { rockCount: number, height: number, history: number[], hits: number };
+
+function CompareValues(a: value, b: value): boolean {
+    if (a.hits < 1) {
+        return false;
+    }
+
+    for (let i = 0; i < a.history.length; ++i) {
+        if (a.history[i] !== b.history[i]) {
+            return false;
         }
+    }
+    return true;
+}
+
+let cache: Map<string, value> = new Map<string, value>();
+function CheckCache(chamber: number[], height: number, wind: number, rock: number): boolean {
+    const k = wind.toString() + " " + (rock % shapeOrder.length).toString();
+    const v = { rockCount: rock, height: height, history: chamber.slice(-10), hits: 0 };
+    if (!cache.has(k)) {
+        cache.set(k, v);
+    } else {
+        const a = cache.get(k);
+        if (CompareValues(a, v)) {
+            let rocksInRepition = rock - a.rockCount;
+            let heightInRepition = height - a.height;
+            let rocksRequired = ROCKS - a.rockCount;
+            let repsRequired = Math.floor(rocksRequired / rocksInRepition);
+            let mod = rocksRequired % rocksInRepition;
+            let estimate = a.height + heightInRepition * repsRequired;
+            const extra = rocks[a.rockCount + mod - 1] - rocks[a.rockCount - 1];
+            console.log(`Total: ${extra + estimate}`);
+
+            return true;
+        }
+        cache.get(k).hits += 1;
+    }
+    return false;
+}
+
+let end = false;
+while (!end) {
+    for (let j = 0; j < jets.length; ++j) {
+        const jet = jets[j];
+        // Jet pushes the rock
         rock.TryMove(chamber, jet);
 
         // rock falls
         if (!rock.Fall(chamber)) {
             maxHeight = AddShapeToChamber(chamber, maxHeight, rock);
+            if (rockIndex < ROCKS) {
+                rocks.push(maxHeight);
+            }
+            if (CheckCache(chamber, maxHeight, j, rockIndex)) {
+                end = true;
+                break;
+            }
             rock = new Shape(maxHeight + 4, GetNextShape());
         }
-    }
-    if (i === ROCKS + 1) {
-        break;
+        if (rockIndex === ROCKS + 1) {
+            console.log(`Total: ${maxHeight}`);
+            end = true;
+            break;
+        }
     }
 }
-log(maxHeight);
