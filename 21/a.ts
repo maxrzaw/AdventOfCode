@@ -1,14 +1,7 @@
-import { log } from 'console';
 import * as fs from 'fs';
 export const ex = "";
 
-enum Operation {
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    None,
-};
+enum Operation { Add, Subtract, Multiply, Divide, Equality, None, };
 
 class Monkey {
     name: string;
@@ -65,21 +58,59 @@ class Monkey {
             case Operation.Divide:
                 this.value = left / right;
                 break;
+            case Operation.Equality:
+                if (left > right) {
+                    this.value = -1;
+                } else if (left < right) {
+                    this.value = 1;
+                } else {
+                    this.value = 0;
+                }
         }
-        this.operation = Operation.None; // this does not actually matter
+
         return this.value;
     }
 }
 
-const filename = process.argv[2];
-
-const input = fs.readFileSync(filename, 'utf8');
-const lines = input.trim().split('\n').map((s) => s.trim());
 const monkeysMap: Map<string, Monkey> = new Map<string, Monkey>();
-for (let line of lines) {
+for (let line of fs.readFileSync(process.argv[2], 'utf8').trim().split('\n').map((s) => s.trim())) {
     const monkeyName: string = line.slice(0, 4);
     monkeysMap.set(monkeyName, new Monkey(line));
 }
 
 const root: Monkey = monkeysMap.get("root");
-log(root.Evaluate(monkeysMap));
+const human: Monkey = monkeysMap.get("humn");
+
+console.log(`Part One: ${root.Evaluate(monkeysMap)}`);
+root.operation = Operation.Equality;
+
+let previousValue: number = 1;
+let lower = 0;
+let upper = 0;
+let stillClimbing = true;
+let result = -1;
+while (true) {
+    let currentValue: number;
+    if (result < 0 && stillClimbing) {
+        currentValue = previousValue * 2;
+    } else if (result === 0) {
+        break;
+    } else if (result > 0 && stillClimbing) {
+        stillClimbing = false;
+        upper = previousValue;
+        currentValue = Math.floor(previousValue / 2);
+        lower = currentValue;
+    } else if (result < 0) {
+        lower = previousValue;
+        currentValue = lower + Math.floor(Math.abs(upper - lower) / 2);
+    }
+    else if (result > 0) {
+        upper = previousValue;
+        currentValue = upper - Math.floor(Math.abs(upper - lower) / 2);
+    }
+    human.value = currentValue;
+    result = root.Evaluate(monkeysMap);
+    previousValue = currentValue;
+}
+
+console.log(`Part Two: ${previousValue}`);
