@@ -15,7 +15,7 @@ func main() {
 	fmt.Println(lines)
 	for _, line := range lines {
 		partOne += recverCalibrationValuePartOne(line)
-		partTwo += recverCalibrationValuePartTwo(line)
+		partTwo += recoverCalibrationValuePartTwo(line)
 	}
 	fmt.Println("Part One:", partOne)
 	fmt.Println("Part Two:", partTwo)
@@ -65,7 +65,7 @@ var numbers = map[string]string{
 	"nine":  "9",
 }
 
-func recverCalibrationValuePartTwo(line string) int {
+func recoverCalibrationValuePartTwo(line string) int {
 	var firstNumber string
 	var lastNumber string
 	currentFirst := len(line)
