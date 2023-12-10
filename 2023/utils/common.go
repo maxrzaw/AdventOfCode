@@ -34,6 +34,16 @@ func ReadInputFile(example bool) []string {
 	return lines
 }
 
+func ReadInputGrid(example bool) [][]string {
+	lines := ReadInputFile(example)
+	var grid [][]string
+	for _, line := range lines {
+		row := strings.Split(line, "")
+		grid = append(grid, row)
+	}
+	return grid
+}
+
 func ParseNumbers(s string) []int {
 	var numbers []int
 	numberStrings := strings.Fields(s)
