@@ -45,3 +45,17 @@ func ParseNumbers(s string) []int {
 	}
 	return numbers
 }
+
+func ReverseArrayCopy[T any](arr []T) []T {
+	var result []T
+	for i := len(arr) - 1; i >= 0; i-- {
+		result = append(result, arr[i])
+	}
+	return result
+}
+
+func ReverseArrayInPlace[T any](arr []T) {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}
