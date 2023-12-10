@@ -11,7 +11,7 @@ const (
 	outsideLoop = 2
 )
 
-const EXAMPLE = true
+const EXAMPLE = false
 
 type Point struct {
 	coord  Coordinate
@@ -161,7 +161,7 @@ func main() {
 	count := 0
 	for _, row := range grid {
 		for _, p := range row {
-			fmt.Print(p.value)
+			fmt.Print(prettyPrint(p.value))
 			if p.value == "֍" {
 				count++
 			}
@@ -457,5 +457,23 @@ func markOutsideOrInside(current Coordinate, grid [][]Point, outside bool) {
 			continue
 		}
 		markOutsideOrInside(next, grid, outside)
+	}
+}
+func prettyPrint(s string) string {
+	switch s {
+	case "L":
+		return "└"
+	case "J":
+		return "┘"
+	case "7":
+		return "┐"
+	case "F":
+		return "┌"
+	case "|":
+		return "│"
+	case "-":
+		return "─"
+	default:
+		return s
 	}
 }
