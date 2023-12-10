@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func ReadInputFile(example bool) []string {
@@ -30,4 +32,16 @@ func ReadInputFile(example bool) []string {
 		os.Exit(1)
 	}
 	return lines
+}
+
+func ParseNumbers(s string) []int {
+	var numbers []int
+	numberStrings := strings.Fields(s)
+	for _, ns := range numberStrings {
+		num, err := strconv.Atoi(ns)
+		if err == nil {
+			numbers = append(numbers, num)
+		}
+	}
+	return numbers
 }
