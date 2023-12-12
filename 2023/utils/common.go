@@ -44,6 +44,15 @@ func ReadInputGrid(example bool) [][]string {
 	return grid
 }
 
+func PrintGrid(grid [][]string) {
+	for _, row := range grid {
+		for _, p := range row {
+			fmt.Print(p)
+		}
+		fmt.Println()
+	}
+}
+
 func ParseNumbers(s string) []int {
 	var numbers []int
 	numberStrings := strings.Fields(s)
@@ -89,4 +98,13 @@ func CalculateLCM(nums []int) int {
 	}
 
 	return result
+}
+
+func Contains[T comparable](value T, arr []T) bool {
+	for _, v := range arr {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }
