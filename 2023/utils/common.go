@@ -69,3 +69,24 @@ func ReverseArrayInPlace[T any](arr []T) {
 		arr[i], arr[j] = arr[j], arr[i]
 	}
 }
+
+func greatestCommonDivisor(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func leastCommonMultiple(a, b int) int {
+	return (a * b) / greatestCommonDivisor(a, b)
+}
+
+func CalculateLCM(nums []int) int {
+	result := 1
+
+	for _, num := range nums {
+		result = leastCommonMultiple(result, num)
+	}
+
+	return result
+}
