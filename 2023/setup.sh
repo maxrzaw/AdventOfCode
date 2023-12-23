@@ -5,6 +5,7 @@ day=$1
 
 # make the directory
 mkdir -p ./day$day
+cp template.go ./day$day/main.go
 
 # use the provided session cookie and request the input file
 trimmed_day=$(echo $day | sed 's/^0*//')
