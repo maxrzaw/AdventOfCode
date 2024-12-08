@@ -4,8 +4,8 @@ const filename = process.argv[2];
 let safeReportsPartTwo = 0;
 let safeReportsPartOne = 0;
 
-const input = fs.readFileSync(filename, 'utf8');
-const reports = input
+const reports = fs
+  .readFileSync(filename, 'utf8')
   .split('\n')
   .filter((x) => x !== '')
   .map((x) => x.split(' ').map((x) => parseInt(x)));
