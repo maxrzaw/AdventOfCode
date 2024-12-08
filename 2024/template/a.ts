@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-export const ex = '';
 
 const filename = process.argv[2];
 
